@@ -1,11 +1,397 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>웹페이지 제목</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>prefer | Online Escape Room</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            color: #f5f2ff;
+            font-family: "Noto Sans KR", Arial, sans-serif;
+
+            /* 판타지 느낌의 기본 배경 */
+            background:
+                radial-gradient(
+                    circle at 20% 20%,
+                    rgba(111, 76, 180, 0.45) 0%,
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 80% 15%,
+                    rgba(48, 92, 180, 0.35) 0%,
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 70% 80%,
+                    rgba(136, 52, 154, 0.35) 0%,
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #080914 0%,
+                    #11152d 45%,
+                    #170f2b 100%
+                );
+
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* 배경의 은은한 빛 효과 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    circle at 50% 40%,
+                    rgba(255, 255, 255, 0.05),
+                    transparent 35%
+                );
+
+            z-index: 0;
+        }
+
+        /* 작은 별빛 */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.45) 1px, transparent 1px),
+                radial-gradient(circle, rgba(180,190,255,0.3) 1px, transparent 1px);
+
+            background-size: 120px 120px, 190px 190px;
+            background-position: 10px 20px, 80px 100px;
+
+            opacity: 0.25;
+            z-index: 0;
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+
+        /* 상단 */
+        header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .logo {
+            font-size: 20px;
+            letter-spacing: 7px;
+            color: rgba(255,255,255,0.75);
+        }
+
+        /* 메인 */
+        main {
+            min-height: calc(100vh - 140px);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 60px 20px;
+        }
+
+        .main-content {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            letter-spacing: 5px;
+            color: rgba(220,215,255,0.65);
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: clamp(40px, 7vw, 72px);
+            line-height: 1.2;
+            font-weight: 300;
+            letter-spacing: -3px;
+
+            /* 제목에도 은은한 빛 */
+            text-shadow:
+                0 0 25px rgba(165,140,255,0.25);
+
+            margin-bottom: 35px;
+        }
+
+        .welcome {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .prefer {
+            font-size: 18px;
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 35px;
+        }
+
+        .description {
+            max-width: 650px;
+            margin: 0 auto 60px;
+
+            color: rgba(235,232,255,0.68);
+            font-size: 15px;
+            line-height: 2;
+        }
+
+        /* 정답 안내 박스 */
+        .guide {
+            max-width: 700px;
+            margin: 0 auto;
+
+            padding: 35px 25px;
+
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+
+            background: rgba(10, 8, 25, 0.22);
+            backdrop-filter: blur(8px);
+        }
+
+        .guide-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .guide-text {
+            color: rgba(235,232,255,0.65);
+            line-height: 1.9;
+            font-size: 14px;
+        }
+
+        .example {
+            display: inline-block;
+
+            margin-top: 20px;
+            padding: 13px 20px;
+
+            max-width: 100%;
+
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 4px;
+
+            color: #eeeaff;
+
+            font-family: monospace;
+            font-size: 14px;
+
+            word-break: break-all;
+
+            box-shadow:
+                0 0 20px rgba(100,80,180,0.12);
+        }
+
+        .hint {
+            margin-top: 25px;
+
+            font-size: 12px;
+            line-height: 1.8;
+
+            color: rgba(255,255,255,0.38);
+        }
+
+        /* 하단 */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+
+            color: rgba(255,255,255,0.3);
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        /* =========================
+           모바일
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            header {
+                padding: 22px 15px;
+            }
+
+            .logo {
+                font-size: 16px;
+                letter-spacing: 5px;
+            }
+
+            main {
+                min-height: calc(100vh - 100px);
+                padding: 45px 18px;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .subtitle {
+                font-size: 10px;
+                letter-spacing: 3px;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: clamp(36px, 11vw, 48px);
+                line-height: 1.25;
+                letter-spacing: -2px;
+                margin-bottom: 30px;
+            }
+
+            .welcome {
+                font-size: 19px;
+            }
+
+            .prefer {
+                font-size: 16px;
+                margin-bottom: 28px;
+            }
+
+            .description {
+                font-size: 13px;
+                line-height: 1.9;
+                margin-bottom: 45px;
+            }
+
+            .guide {
+                padding: 28px 18px;
+            }
+
+            .guide-title {
+                font-size: 16px;
+            }
+
+            .guide-text {
+                font-size: 13px;
+                line-height: 1.8;
+            }
+
+            .example {
+                display: block;
+                width: 100%;
+                padding: 12px 10px;
+                font-size: 11px;
+                line-height: 1.5;
+            }
+
+            .hint {
+                font-size: 11px;
+            }
+
+            footer {
+                padding: 25px 15px;
+            }
+        }
+    </style>
 </head>
+
+
 <body>
-    <h1>안녕하세요!</h1>
-    <p>열심히 공사 중입니다</p>
+
+<div class="page">
+
+    <header>
+        <div class="logo">
+            PREFER
+        </div>
+    </header>
+
+
+    <main>
+
+        <div class="main-content">
+
+            <div class="subtitle">
+                ONLINE ESCAPE ROOM
+            </div>
+
+
+            <h1>
+                세상에 없던<br>
+                새로운 방탈출
+            </h1>
+
+
+            <div class="welcome">
+                환영합니다.
+            </div>
+
+
+            <div class="prefer">
+                prefer 입니다.
+            </div>
+
+
+            <div class="description">
+                정해진 방식도, 시간도, 제약도 없는 자유로운 공간으로
+                탐험을 시작합니다.
+            </div>
+
+
+            <div class="guide">
+
+                <div class="guide-title">
+                    정답 입력 방법
+                </div>
+
+
+                <div class="guide-text">
+                    각 문제의 정답은 아래와 같은 형태로 진입해 주세요.<br>
+                    사이트 도메인의 끝에 정답을 입력 후 이동
+                </div>
+
+
+                <div class="example">
+                    https://preferlab.co.kr/answer
+                </div>
+
+
+                <div class="hint">
+                    예 : 현재 위치에서 정답이 'answer'라면,<br>
+                    인터넷 창에 https://preferlab.co.kr/answer 입력 후 엔터
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        PREFER · ONLINE ESCAPE ROOM
+    </footer>
+
+</div>
+
 </body>
 </html>
+```
