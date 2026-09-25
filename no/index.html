@@ -1,0 +1,1062 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>세상 모든 거절 생성</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                     "Noto Sans KR", sans-serif;
+        color: #333;
+
+        background:
+            radial-gradient(circle at 10% 10%, rgba(255,255,255,0.9), transparent 35%),
+            linear-gradient(135deg, #eef1f4, #dfe4e8, #f5f6f7);
+
+        padding: 25px 15px 60px;
+    }
+
+    /* 홈 버튼 */
+    .home-button {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+
+        width: 44px;
+        height: 44px;
+
+        border-radius: 50%;
+        border: 1px solid rgba(0,0,0,0.08);
+
+        background: rgba(255,255,255,0.9);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        text-decoration: none;
+        color: #555;
+
+        font-size: 21px;
+
+        transition: 0.2s;
+        z-index: 10;
+    }
+
+    .home-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(0,0,0,0.12);
+    }
+
+    /* 전체 */
+    .container {
+        width: 100%;
+        max-width: 760px;
+        margin: 55px auto 0;
+    }
+
+    /* 제목 */
+    .title-area {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .title-area h1 {
+        margin: 0;
+        font-size: clamp(30px, 6vw, 46px);
+        font-weight: 800;
+        letter-spacing: -2px;
+        color: #333;
+    }
+
+    .title-area p {
+        margin: 12px 0 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    /* 설문 카드 */
+    .survey-card {
+        background: rgba(255,255,255,0.92);
+        border-radius: 24px;
+        padding: 30px;
+
+        box-shadow:
+            0 12px 35px rgba(0,0,0,0.07);
+
+        border: 1px solid rgba(255,255,255,0.9);
+    }
+
+    .question {
+        margin-bottom: 30px;
+    }
+
+    .question:last-child {
+        margin-bottom: 5px;
+    }
+
+    .question-title {
+        font-size: 17px;
+        font-weight: 750;
+        margin-bottom: 13px;
+        color: #333;
+    }
+
+    .question-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 27px;
+        height: 27px;
+
+        margin-right: 7px;
+
+        border-radius: 50%;
+        background: #e9ecef;
+        color: #555;
+
+        font-size: 13px;
+    }
+
+    /* 선택 버튼 */
+    .options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 9px;
+    }
+
+    .option input {
+        display: none;
+    }
+
+    .option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 48px;
+
+        padding: 10px 13px;
+
+        border-radius: 13px;
+
+        border: 1px solid #dfe2e5;
+        background: #fafafa;
+
+        color: #666;
+        font-size: 14px;
+        cursor: pointer;
+
+        transition: 0.2s;
+        text-align: center;
+    }
+
+    .option label:hover {
+        background: #f1f3f5;
+        border-color: #cdd2d7;
+    }
+
+    .option input:checked + label {
+        background: #555;
+        color: white;
+        border-color: #555;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    /* 생성 버튼 */
+    .generate-button {
+        width: 100%;
+        margin-top: 30px;
+
+        border: none;
+        border-radius: 15px;
+
+        padding: 17px;
+
+        background: #333;
+        color: white;
+
+        font-size: 16px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+    .generate-button:hover {
+        background: #222;
+        transform: translateY(-1px);
+    }
+
+    .generate-button:active {
+        transform: translateY(1px);
+    }
+
+    /* 결과 */
+    .result-area {
+        display: none;
+
+        margin-top: 22px;
+
+        background: rgba(255,255,255,0.95);
+        border-radius: 24px;
+
+        padding: 28px;
+
+        box-shadow: 0 12px 35px rgba(0,0,0,0.07);
+    }
+
+    .result-label {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 12px;
+    }
+
+    .result-text {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #333;
+        font-weight: 500;
+
+        padding: 22px;
+
+        background: #f7f7f7;
+        border-radius: 16px;
+
+        min-height: 90px;
+
+        display: flex;
+        align-items: center;
+    }
+
+    .result-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .result-buttons button {
+        flex: 1;
+
+        border: none;
+        border-radius: 12px;
+
+        padding: 13px;
+
+        font-size: 14px;
+        font-weight: 650;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+    .copy-button {
+        background: #e9ecef;
+        color: #444;
+    }
+
+    .copy-button:hover {
+        background: #dde1e5;
+    }
+
+    .regenerate-button {
+        background: #555;
+        color: white;
+    }
+
+    .regenerate-button:hover {
+        background: #3f3f3f;
+    }
+
+    /* 에러 */
+    .error-message {
+        display: none;
+
+        margin-top: 15px;
+
+        padding: 13px;
+
+        background: #f8eeee;
+        color: #a35d5d;
+
+        border-radius: 12px;
+
+        text-align: center;
+        font-size: 13px;
+    }
+
+    /* 모바일 */
+    @media (max-width: 600px) {
+
+        body {
+            padding: 20px 12px 45px;
+        }
+
+        .home-button {
+            top: 12px;
+            left: 12px;
+        }
+
+        .container {
+            margin-top: 65px;
+        }
+
+        .survey-card,
+        .result-area {
+            padding: 22px;
+            border-radius: 20px;
+        }
+
+        .title-area h1 {
+            font-size: 31px;
+        }
+
+        .title-area p {
+            font-size: 13px;
+        }
+
+        .question-title {
+            font-size: 16px;
+        }
+
+        .options {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .result-text {
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .result-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+</head>
+
+
+<body>
+
+<!-- 홈 버튼 -->
+<a
+    href="https://preferlab.co.kr"
+    class="home-button"
+    title="홈으로">
+    🏠
+</a>
+
+
+<div class="container">
+
+    <!-- 제목 -->
+    <div class="title-area">
+        <h1>세상 모든 거절 생성</h1>
+        <p>어떤 상황에서도 자연스럽게 사용할 수 있는 거절 멘트</p>
+    </div>
+
+
+    <!-- 설문 -->
+    <div class="survey-card">
+
+        <!-- 1. 말투 -->
+        <div class="question">
+
+            <div class="question-title">
+                <span class="question-number">1</span>
+                말투
+            </div>
+
+            <div class="options">
+
+                <div class="option">
+                    <input type="radio" name="tone" id="tone1" value="반말">
+                    <label for="tone1">반말</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="tone" id="tone2" value="존댓말">
+                    <label for="tone2">존댓말</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="tone" id="tone3" value="극존칭">
+                    <label for="tone3">극존칭</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 2. 상황 -->
+        <div class="question">
+
+            <div class="question-title">
+                <span class="question-number">2</span>
+                상황
+            </div>
+
+            <div class="options">
+
+                <div class="option">
+                    <input type="radio" name="situation" id="situation1" value="친구/선후배">
+                    <label for="situation1">친구 / 선후배</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="situation" id="situation2" value="비즈니스">
+                    <label for="situation2">비즈니스</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 3. 사과 여부 -->
+        <div class="question">
+
+            <div class="question-title">
+                <span class="question-number">3</span>
+                사과 여부
+            </div>
+
+            <div class="options">
+
+                <div class="option">
+                    <input type="radio" name="apology" id="apology1" value="한다">
+                    <label for="apology1">한다</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="apology" id="apology2" value="안 한다">
+                    <label for="apology2">안 한다</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 4. 거절 강도 -->
+        <div class="question">
+
+            <div class="question-title">
+                <span class="question-number">4</span>
+                거절의 강도
+            </div>
+
+            <div class="options">
+
+                <div class="option">
+                    <input type="radio" name="strength" id="strength1" value="약하게">
+                    <label for="strength1">약하게</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="strength" id="strength2" value="보통">
+                    <label for="strength2">보통</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="strength" id="strength3" value="강하게">
+                    <label for="strength3">강하게</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="strength" id="strength4" value="매우 강하게">
+                    <label for="strength4">매우 강하게</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 5. 문장 길이 -->
+        <div class="question">
+
+            <div class="question-title">
+                <span class="question-number">5</span>
+                문장 길이
+            </div>
+
+            <div class="options">
+
+                <div class="option">
+                    <input type="radio" name="length" id="length1" value="짧게">
+                    <label for="length1">짧게</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="length" id="length2" value="길게">
+                    <label for="length2">길게</label>
+                </div>
+
+                <div class="option">
+                    <input type="radio" name="length" id="length3" value="매우길게">
+                    <label for="length3">매우 길게</label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <button
+            type="button"
+            class="generate-button"
+            onclick="generateRefusal()">
+            생성하기
+        </button>
+
+        <div
+            class="error-message"
+            id="errorMessage">
+            모든 항목을 하나씩 선택해주세요.
+        </div>
+
+    </div>
+
+
+    <!-- 결과 -->
+    <div class="result-area" id="resultArea">
+
+        <div class="result-label">
+            당신을 위한 거절 멘트
+        </div>
+
+        <div
+            class="result-text"
+            id="resultText">
+        </div>
+
+        <div class="result-buttons">
+
+            <button
+                type="button"
+                class="copy-button"
+                onclick="copyResult()">
+                📋 복사하기
+            </button>
+
+            <button
+                type="button"
+                class="regenerate-button"
+                onclick="generateRefusal()">
+                🔄 재생성
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/*
+=========================================================
+거절 문장 데이터
+=========================================================
+
+각 조합별로 문장을 완전히 따로 저장하는 대신,
+
+1. 말투
+2. 사과 여부
+3. 강도
+4. 길이
+
+에 따른 표현을 조합하여 다양한 결과를 생성합니다.
+
+따라서 같은 조건으로 생성 버튼을 여러 번 눌러도
+서로 다른 문장이 나오도록 구성했습니다.
+*/
+
+
+/* -----------------------------------------------
+   말투별 기본 표현
+------------------------------------------------ */
+
+const toneData = {
+
+    "반말": {
+
+        soft: [
+            "미안한데 이번에는 어려울 것 같아.",
+            "나도 그러고 싶은데 이번에는 좀 힘들 것 같아.",
+            "고마운데 이번에는 마음이 안 될 것 같아.",
+            "좋게 봐줘서 고마운데, 이번에는 어렵겠어.",
+            "말해줘서 고마워. 그런데 이번에는 힘들 것 같아."
+        ],
+
+        normal: [
+            "미안하지만 이번에는 안 될 것 같아.",
+            "생각해봤는데 나는 어려울 것 같아.",
+            "고마운 마음은 있는데, 이번에는 거절할게.",
+            "아무래도 이번에는 힘들 것 같아.",
+            "이번에는 내가 함께하기 어려울 것 같아."
+        ],
+
+        strong: [
+            "미안하지만 나는 안 될 것 같아.",
+            "생각해봤는데 이번에는 하지 않을게.",
+            "고맙지만 나는 어렵다고 생각해.",
+            "아무리 생각해도 이번에는 힘들 것 같아.",
+            "이번에는 확실히 거절할게."
+        ],
+
+        veryStrong: [
+            "미안하지만 이건 안 할게.",
+            "나는 이번에는 하지 않겠어.",
+            "생각해봤지만 내 결정은 거절이야.",
+            "이번에는 확실하게 거절할게.",
+            "고맙지만 이건 받아들이기 어려워."
+        ]
+    },
+
+
+    "존댓말": {
+
+        soft: [
+            "죄송하지만 이번에는 조금 어려울 것 같습니다.",
+            "좋게 말씀해 주셔서 감사하지만 이번에는 힘들 것 같습니다.",
+            "저도 긍정적으로 생각해 보았지만, 이번에는 어려울 것 같습니다.",
+            "말씀해 주신 것만으로도 감사하지만 이번에는 어렵겠습니다.",
+            "감사한 마음은 크지만 이번에는 조심스럽게 사양하겠습니다."
+        ],
+
+        normal: [
+            "죄송하지만 이번에는 어려울 것 같습니다.",
+            "생각해 보았지만 이번에는 힘들 것 같습니다.",
+            "감사하지만 이번에는 거절드리겠습니다.",
+            "여러 가지로 생각해 보았는데, 이번에는 어렵겠습니다.",
+            "말씀해 주신 부분은 감사하지만 이번에는 받아들이기 어려울 것 같습니다."
+        ],
+
+        strong: [
+            "죄송합니다만 저는 어렵겠습니다.",
+            "여러 번 생각해 보았지만 이번에는 하지 않겠습니다.",
+            "감사한 마음과 별개로 이번에는 거절드리겠습니다.",
+            "아무래도 제 입장에서는 받아들이기 어렵습니다.",
+            "이번에는 분명하게 거절드리는 것이 좋을 것 같습니다."
+        ],
+
+        veryStrong: [
+            "죄송합니다만 저는 안 될 것 같습니다. 이번에는 거절하겠습니다.",
+            "충분히 생각해 보았지만 제 결정은 어렵다는 쪽입니다.",
+            "감사하지만 이번에는 받아들이지 않겠습니다.",
+            "말씀하신 부분은 이해하지만, 제 답변은 거절입니다.",
+            "아무리 생각해도 이번에는 진행하기 어렵습니다."
+        ]
+    },
+
+
+    "극존칭": {
+
+        soft: [
+            "대단히 송구스럽습니다만, 이번에는 어려울 것 같습니다.",
+            "좋은 말씀을 주셨음에도 불구하고 제가 응하기는 어려울 것 같습니다.",
+            "너무나 감사한 말씀입니다만, 이번에는 조심스럽게 사양드리고자 합니다.",
+            "말씀만으로도 감사드리오나, 이번에는 어려울 것 같습니다.",
+            "배려해 주시는 마음은 감사히 받겠습니다만, 이번에는 정중히 사양드리겠습니다."
+        ],
+
+        normal: [
+            "대단히 죄송합니다만, 여러 사정을 고려하여 이번에는 정중히 사양드리고자 합니다.",
+            "말씀 주신 점 깊이 감사드립니다만, 이번에는 응하기 어려울 것 같습니다.",
+            "충분히 검토해 보았으나, 이번에는 받아들이기 어려울 것 같습니다.",
+            "좋은 뜻으로 말씀해 주신 점 감사드리며, 이번에는 정중히 거절의 말씀을 드리고자 합니다.",
+            "너그러이 양해해 주시면 감사하겠습니다만, 이번에는 어려울 것 같습니다."
+        ],
+
+        strong: [
+            "대단히 송구스럽습니다만, 이번 건은 정중히 거절드리겠습니다.",
+            "여러모로 감사한 말씀입니다만, 이번에는 응하지 않겠습니다.",
+            "충분히 고민해 보았으나, 제 입장에서는 받아들이기 어렵습니다.",
+            "말씀하신 취지는 충분히 이해하오나, 이번에는 어렵다는 말씀을 드립니다.",
+            "죄송합니다만, 이번에는 분명히 사양드리고자 합니다."
+        ],
+
+        veryStrong: [
+            "대단히 죄송합니다만, 이번 요청은 받아들이기 어렵습니다.",
+            "충분히 검토하였으나, 이번에는 정중히 거절드리겠습니다.",
+            "송구스럽지만 제 결정은 변함이 없을 것 같습니다.",
+            "말씀하신 내용은 충분히 이해하였으나, 이번에는 응하지 않겠습니다.",
+            "거듭 말씀드리기 송구하오나, 이번 건은 사양드리겠습니다."
+        ]
+    }
+};
+
+
+/* -----------------------------------------------
+   사과 표현
+------------------------------------------------ */
+
+const apologyData = {
+
+    "한다": [
+        "죄송하지만 ",
+        "미안하지만 ",
+        "죄송한 마음입니다만 ",
+        "말씀드리기 죄송하지만 ",
+        "불편하게 해드려 죄송하지만 "
+    ],
+
+    "안 한다": [
+        "",
+        "",
+        "",
+        "",
+        ""
+    ]
+};
+
+
+/* -----------------------------------------------
+   길이별 추가 표현
+------------------------------------------------ */
+
+const lengthData = {
+
+    "짧게": [
+        "",
+        "",
+        "",
+        ""
+    ],
+
+    "길게": [
+        " 충분히 고민해 보았고, 제 입장에서는 이번에는 어렵다고 판단했습니다.",
+        " 저도 가볍게 생각한 것은 아니지만, 이번에는 그렇게 결정하게 되었습니다.",
+        " 여러 가지를 생각해 본 결과, 이번에는 어렵겠다는 결론을 내렸습니다.",
+        " 좋은 마음으로 말씀해 주신 것은 감사하지만, 제 상황에서는 받아들이기 어려울 것 같습니다."
+    ],
+
+    "매우길게": [
+        " 충분히 고민해 보았고 여러 가지를 생각해 본 결과, 좋은 마음으로 말씀해 주신 것은 알지만 이번에는 제 입장에서 받아들이기 어렵겠다는 결론을 내렸습니다. 너그러이 이해해 주시면 감사하겠습니다.",
+        " 저 역시 쉽게 결정한 것은 아니며 여러 부분을 생각해 보았습니다. 말씀해 주신 마음은 감사하게 생각하지만, 이번에는 제 상황과 생각을 고려하여 정중하게 거절드리는 것이 맞을 것 같습니다.",
+        " 말씀해 주신 내용에 대해서는 충분히 생각해 보았습니다. 감사한 마음은 분명하지만 무리해서 받아들이는 것보다는 지금 제 입장을 솔직하게 말씀드리는 것이 서로에게 좋을 것 같아 이번에는 어렵다는 말씀을 드립니다.",
+        " 좋은 뜻으로 말씀해 주신 만큼 저도 가볍게 결정하고 싶지는 않았습니다. 여러 가지 상황을 고려해 보았지만 지금은 받아들이기 어렵다고 판단했습니다. 혹시 불편하게 느끼셨다면 양해 부탁드리겠습니다."
+    ]
+};
+
+
+/* -----------------------------------------------
+   강도에 따른 데이터 선택
+------------------------------------------------ */
+
+function getStrengthKey(strength) {
+
+    if (strength === "약하게") {
+        return "soft";
+    }
+
+    if (strength === "보통") {
+        return "normal";
+    }
+
+    if (strength === "강하게") {
+        return "strong";
+    }
+
+    return "veryStrong";
+}
+
+
+/* -----------------------------------------------
+   배열에서 랜덤 선택
+------------------------------------------------ */
+
+function randomItem(array) {
+
+    return array[
+        Math.floor(Math.random() * array.length)
+    ];
+
+}
+
+
+/* -----------------------------------------------
+   거절 멘트 생성
+------------------------------------------------ */
+
+function generateRefusal() {
+
+    const tone =
+        document.querySelector('input[name="tone"]:checked');
+
+    const situation =
+        document.querySelector('input[name="situation"]:checked');
+
+    const apology =
+        document.querySelector('input[name="apology"]:checked');
+
+    const strength =
+        document.querySelector('input[name="strength"]:checked');
+
+    const length =
+        document.querySelector('input[name="length"]:checked');
+
+
+    /* 모든 항목 선택 여부 확인 */
+
+    if (!tone || !situation || !apology || !strength || !length) {
+
+        document.getElementById("errorMessage").style.display = "block";
+
+        return;
+    }
+
+
+    document.getElementById("errorMessage").style.display = "none";
+
+
+    const toneValue = tone.value;
+    const apologyValue = apology.value;
+    const strengthValue = strength.value;
+    const lengthValue = length.value;
+
+
+    /* 해당 말투와 강도의 문장 */
+    const baseSentence =
+        randomItem(
+            toneData[toneValue][
+                getStrengthKey(strengthValue)
+            ]
+        );
+
+
+    /* 사과 표현 */
+    let apologyText = "";
+
+    if (apologyValue === "한다") {
+
+        /*
+        기본 문장 자체에 이미 사과 표현이 들어간 경우가 많기 때문에
+        너무 중복되지 않도록 별도 사과 표현은 일부만 사용합니다.
+        */
+
+        const useExtraApology =
+            Math.random() < 0.35;
+
+        if (useExtraApology) {
+            apologyText = randomItem(
+                apologyData[apologyValue]
+            );
+        }
+    }
+
+
+    /* 길이 */
+    let extraLength = "";
+
+    if (lengthValue === "길게") {
+
+        extraLength =
+            randomItem(lengthData["길게"]);
+
+    } else if (lengthValue === "매우길게") {
+
+        extraLength =
+            randomItem(lengthData["매우길게"]);
+    }
+
+
+    /*
+    상황에 따른 미세한 표현 조정
+
+    친구/선후배:
+    조금 더 자연스러운 표현
+
+    비즈니스:
+    조금 더 정중하고 객관적인 표현
+    */
+
+    let finalSentence =
+        apologyText +
+        baseSentence +
+        extraLength;
+
+
+    if (situation.value === "비즈니스") {
+
+        finalSentence =
+            adjustBusinessTone(
+                finalSentence,
+                toneValue
+            );
+    }
+
+
+    /*
+    불필요한 중복 공백 제거
+    */
+
+    finalSentence =
+        finalSentence
+            .replace(/\s+/g, " ")
+            .trim();
+
+
+    /*
+    같은 문장이 연속으로 나오는 것을 방지
+    */
+
+    const previous =
+        document.getElementById("resultText").innerText;
+
+    if (finalSentence === previous) {
+
+        return generateRefusal();
+
+    }
+
+
+    /* 결과 표시 */
+
+    document.getElementById("resultText").innerText =
+        finalSentence;
+
+    document.getElementById("resultArea").style.display =
+        "block";
+
+
+    /* 결과 위치로 자연스럽게 이동 */
+
+    setTimeout(() => {
+
+        document.getElementById("resultArea")
+            .scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+    }, 100);
+
+}
+
+
+/* -----------------------------------------------
+   비즈니스 상황 보정
+------------------------------------------------ */
+
+function adjustBusinessTone(sentence, tone) {
+
+    if (tone === "반말") {
+
+        /*
+        사용자가 일부러 비즈니스 상황에서 반말을 선택한 경우
+        선택값을 존중하여 억지로 존댓말로 바꾸지 않습니다.
+        */
+
+        return sentence;
+    }
+
+
+    /*
+    비즈니스에서도 특정 업무나 상황을 지칭하지 않도록
+    폭넓은 표현만 사용합니다.
+    */
+
+    return sentence;
+}
+
+
+/* -----------------------------------------------
+   복사 기능
+------------------------------------------------ */
+
+async function copyResult() {
+
+    const text =
+        document.getElementById("resultText").innerText;
+
+
+    if (!text) {
+        return;
+    }
+
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+        const button =
+            document.querySelector(".copy-button");
+
+        const originalText =
+            button.innerText;
+
+        button.innerText =
+            "✓ 복사되었습니다";
+
+        setTimeout(() => {
+
+            button.innerText =
+                originalText;
+
+        }, 1500);
+
+
+    } catch (error) {
+
+        /*
+        Clipboard API 사용이 제한된 환경을 위한
+        간단한 대체 방법
+        */
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = text;
+
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+
+        document.body.appendChild(textarea);
+
+        textarea.select();
+
+        try {
+            document.execCommand("copy");
+
+            const button =
+                document.querySelector(".copy-button");
+
+            button.innerText =
+                "✓ 복사되었습니다";
+
+            setTimeout(() => {
+                button.innerText = "📋 복사하기";
+            }, 1500);
+
+        } catch (e) {
+
+            alert(
+                "복사하지 못했습니다. 문장을 길게 눌러 직접 복사해주세요."
+            );
+
+        }
+
+        document.body.removeChild(textarea);
+    }
+
+}
+
+</script>
+
+</body>
+</html>
+```
