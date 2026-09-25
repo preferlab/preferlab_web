@@ -515,21 +515,21 @@ function loadChallenge() {
 
     else if (currentChallenge === 3) {
 
-        setHeader(
-            "CAPTCHA 3 / 4",
-            "소화전을 모두 누르세요",
-            "사진이 흐릿합니다. 자세히 살펴보세요."
-        );
+    setHeader(
+        "CAPTCHA 3 / 4",
+        "소화전을 모두 누르세요",
+        "카드를 눌러 사진을 확인하세요."
+    );
 
-        const items = [
-            "🏙️","🧯","🏢",
-            "🚗","🏢","🧯",
-            "🌫️","🚗","🏢"
-        ];
+    const items = [
+        "🏙️","🧯","🏢",
+        "🚗","🏢","🧯",
+        "🌫️","🚗","🏢"
+    ];
 
-        createTiles(items, "🧯");
+    createFlipTiles(items);
 
-    }
+}
 
 
     /* ---------------------
@@ -618,6 +618,111 @@ function createTiles(items, correctEmoji) {
 
 }
 
+function createTiles(items, correctEmoji) {
+
+    const grid = document.getElementById("normalGrid");
+
+    items.forEach((emoji, index) => {
+
+        const tile = document.createElement("div");
+
+        tile.className = "tile";
+        tile.innerText = emoji;
+
+        tile.dataset.correct =
+            emoji === correctEmoji ? "true" : "false";
+
+        tile.onclick = function() {
+
+            if (tile.classList.contains("selected")) {
+
+                tile.classList.remove("selected");
+
+                selectedTiles =
+                    selectedTiles.filter(i => i !== index);
+
+            } else {
+
+                tile.classList.add("selected");
+                selectedTiles.push(index);
+
+                if (currentChallenge === 2 &&
+                    emoji === "🚦") {
+
+                    moveTrafficLight(tile);
+                }
+
+            }
+
+            updateStatus();
+
+        };
+
+        grid.appendChild(tile);
+
+    });
+
+}
+
+
+/* =========================
+   3번 카드 뒤집기 캡차
+========================= */
+
+function createFlipTiles(items) {
+
+    const grid =
+        document.getElementById("normalGrid");
+
+    items.forEach((emoji, index) => {
+
+        const tile =
+            document.createElement("div");
+
+        tile.className = "tile";
+
+        // 처음에는 카드 뒷면
+        tile.innerText = "❓";
+
+        tile.dataset.emoji = emoji;
+
+        tile.onclick = function() {
+
+            if (tile.classList.contains("selected")) {
+                return;
+            }
+
+            // 카드 앞면 표시
+            tile.innerText = emoji;
+
+            // 소화전인 경우
+            if (emoji === "🧯") {
+
+                tile.classList.add("selected");
+
+                selectedTiles.push(index);
+
+                updateStatus();
+
+            } else {
+
+                // 소화전이 아닌 경우
+                // 0.5초 동안만 보여줌
+                setTimeout(() => {
+
+                    tile.innerText = "❓";
+
+                }, 500);
+
+            }
+
+        };
+
+        grid.appendChild(tile);
+
+    });
+
+}
 
 /* =========================
    2번 신호등 이동
@@ -625,12 +730,14 @@ function createTiles(items, correctEmoji) {
 
 function moveTrafficLight(tile) {
 
-    if (movingLights >= 3) {
+    // 최소 5회, 최대 7회 이동
+    if (movingLights >= 7) {
         return;
     }
 
     movingLights++;
 
+    // 기존보다 빠르게 이동
     setTimeout(() => {
 
         const grid = document.getElementById("normalGrid");
@@ -638,6 +745,7 @@ function moveTrafficLight(tile) {
         const tiles =
             Array.from(grid.children);
 
+        // 현재 신호등이 아닌 칸 중 하나를 선택
         let emptyTiles =
             tiles.filter(t =>
                 t.innerText !== "🚦"
@@ -654,9 +762,11 @@ function moveTrafficLight(tile) {
                 )
             ];
 
+        // 신호등 이동
         target.innerText = "🚦";
         target.dataset.correct = "true";
 
+        // 기존 위치는 자동차로 변경
         tile.innerText = "🚗";
         tile.dataset.correct = "false";
 
@@ -669,7 +779,7 @@ function moveTrafficLight(tile) {
 
         updateStatus();
 
-    }, 250);
+    }, 100); // 기존 250ms → 100ms
 
 }
 
