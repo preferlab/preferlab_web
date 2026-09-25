@@ -2,10 +2,462 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>The Best Hotel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>THE BEST HOTEL</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, "Noto Sans KR", sans-serif;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: auto;
+            height: 80px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            cursor: pointer;
+
+            font-size: 15px;
+            color: #444;
+
+            padding: 10px 5px;
+        }
+
+        nav button:hover {
+            color: #000;
+            border-bottom: 2px solid #000;
+        }
+
+        /* =========================
+           MAIN IMAGE
+        ========================= */
+
+        .hero {
+            height: 420px;
+
+            background-image:
+                linear-gradient(
+                    rgba(0,0,0,0.25),
+                    rgba(0,0,0,0.25)
+                ),
+                url("hotel.jpg");
+
+            background-size: cover;
+            background-position: center;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 18px;
+        }
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .content {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            display: none;
+            background-color: white;
+
+            padding: 40px;
+            min-height: 300px;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 28px;
+            margin-bottom: 25px;
+        }
+
+        .section p {
+            line-height: 1.8;
+        }
+
+        /* =========================
+           ROOM CARD
+        ========================= */
+
+        .room-list {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .room {
+            flex: 1;
+            min-width: 250px;
+
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        .room h3 {
+            margin-top: 0;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background-color: #222;
+            color: #aaa;
+
+            text-align: center;
+            padding: 30px;
+
+            margin-top: 80px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .header-inner {
+                height: auto;
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav {
+                gap: 10px;
+            }
+
+            nav button {
+                font-size: 13px;
+            }
+
+            .hero {
+                height: 300px;
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+            .section {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
+
+
 <body>
-    <h1>The Best Hotel</h1>
-    <p>호텔 사이트 테스트 페이지입니다.</p>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <div class="header-inner">
+
+        <div class="logo">
+            THE BEST HOTEL
+        </div>
+
+        <nav>
+
+            <button onclick="showSection('about')">
+                호텔 소개
+            </button>
+
+            <button onclick="showSection('rooms')">
+                객실
+            </button>
+
+            <button onclick="showSection('location')">
+                위치
+            </button>
+
+            <button onclick="showSection('information')">
+                이용 안내
+            </button>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+    <div>
+
+        <h1>THE BEST HOTEL</h1>
+
+        <p>
+            A PLACE TO REMEMBER
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CONTENT
+========================= -->
+
+<main class="content">
+
+
+    <!-- 호텔 소개 -->
+
+    <section id="about" class="section active">
+
+        <h2>호텔 소개</h2>
+
+        <p>
+            여기에 호텔 소개 내용을 입력하세요.
+        </p>
+
+        <p>
+            호텔의 역사, 특징, 서비스 등을 작성할 수 있습니다.
+        </p>
+
+        <!--
+            방탈출 단서를 넣고 싶다면
+            이곳에 특정 문장이나 이미지 등을 추가할 수 있습니다.
+        -->
+
+    </section>
+
+
+    <!-- 객실 -->
+
+    <section id="rooms" class="section">
+
+        <h2>객실</h2>
+
+        <div class="room-list">
+
+            <div class="room">
+
+                <h3>STANDARD ROOM</h3>
+
+                <p>
+                    객실 설명을 입력하세요.
+                </p>
+
+                <p>
+                    객실 번호 : 101
+                </p>
+
+            </div>
+
+
+            <div class="room">
+
+                <h3>DELUXE ROOM</h3>
+
+                <p>
+                    객실 설명을 입력하세요.
+                </p>
+
+                <p>
+                    객실 번호 : 201
+                </p>
+
+            </div>
+
+
+            <div class="room">
+
+                <h3>SUITE ROOM</h3>
+
+                <p>
+                    객실 설명을 입력하세요.
+                </p>
+
+                <p>
+                    객실 번호 : 301
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 위치 -->
+
+    <section id="location" class="section">
+
+        <h2>위치</h2>
+
+        <p>
+            호텔 주소를 입력하세요.
+        </p>
+
+        <p>
+            주변 관광지나 교통편 등을 입력하세요.
+        </p>
+
+        <!--
+            지도 API를 사용하지 않고
+            단순히 주소와 설명만 표시하도록 구성했습니다.
+        -->
+
+    </section>
+
+
+    <!-- 이용 안내 -->
+
+    <section id="information" class="section">
+
+        <h2>이용 안내</h2>
+
+        <p>
+            체크인 : 15:00
+        </p>
+
+        <p>
+            체크아웃 : 11:00
+        </p>
+
+        <p>
+            호텔 이용 규칙 등을 입력하세요.
+        </p>
+
+    </section>
+
+
+</main>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    <p>
+        © 2026 THE BEST HOTEL
+    </p>
+
+</footer>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+    function showSection(sectionId) {
+
+        // 모든 섹션 숨기기
+
+        const sections =
+            document.querySelectorAll(".section");
+
+        sections.forEach(function(section) {
+
+            section.classList.remove("active");
+
+        });
+
+
+        // 선택한 섹션만 보여주기
+
+        const selectedSection =
+            document.getElementById(sectionId);
+
+        selectedSection.classList.add("active");
+
+
+        // 선택한 내용이 있는 곳으로 이동
+
+        window.scrollTo({
+            top: document.querySelector(".content").offsetTop - 100,
+            behavior: "smooth"
+        });
+
+    }
+
+</script>
+
+
 </body>
 </html>
