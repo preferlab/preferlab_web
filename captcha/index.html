@@ -1,0 +1,843 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로봇이 절대 아닙니다</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, "Noto Sans KR", sans-serif;
+        background: #f5f7fa;
+        color: #333;
+    }
+
+    /* 홈 버튼 */
+    .home-btn {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        font-size: 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        z-index: 100;
+        transition: 0.2s;
+    }
+
+    .home-btn:hover {
+        transform: scale(1.08);
+        background: #f1f3f4;
+    }
+
+    /* 전체 화면 */
+    .container {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 15px;
+    }
+
+    /* 캡차 박스 */
+    .captcha-box {
+        width: 390px;
+        max-width: 100%;
+        background: white;
+        border: 1px solid #d6d9dc;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        overflow: hidden;
+    }
+
+    /* 첫 화면 */
+    .robot-check {
+        min-height: 90px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .checkbox {
+        width: 28px;
+        height: 28px;
+        border: 2px solid #777;
+        border-radius: 3px;
+        cursor: pointer;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 21px;
+        flex-shrink: 0;
+    }
+
+    .checkbox.checked {
+        background: #4285f4;
+        border-color: #4285f4;
+        color: white;
+    }
+
+    .robot-text {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .captcha-logo {
+        margin-left: auto;
+        text-align: center;
+        color: #777;
+        font-size: 11px;
+    }
+
+    .captcha-logo-icon {
+        font-size: 30px;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    /* 문제 화면 */
+    .challenge {
+        display: none;
+    }
+
+    .challenge-header {
+        background: #4285f4;
+        color: white;
+        padding: 20px;
+    }
+
+    .challenge-number {
+        font-size: 12px;
+        opacity: 0.9;
+        margin-bottom: 5px;
+    }
+
+    .challenge-title {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .challenge-subtitle {
+        margin-top: 6px;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    /* 3x3 격자 */
+    .grid {
+        padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        background: #fff;
+    }
+
+    .tile {
+        aspect-ratio: 1 / 1;
+        background: #eef1f5;
+        border: 1px solid #ddd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 48px;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        overflow: hidden;
+        transition: 0.15s;
+    }
+
+    .tile:hover {
+        filter: brightness(0.93);
+    }
+
+    .tile.selected {
+        outline: 4px solid #4285f4;
+        outline-offset: -4px;
+        background: #dce9ff;
+    }
+
+    /* 이미지처럼 보이게 하기 위한 다양한 배경 */
+    .tile:nth-child(3n+1) {
+        background: #e8edf2;
+    }
+
+    .tile:nth-child(3n+2) {
+        background: #f2f0e9;
+    }
+
+    .tile:nth-child(3n) {
+        background: #e8eee8;
+    }
+
+    /* 버튼 영역 */
+    .challenge-footer {
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #eee;
+    }
+
+    .status {
+        font-size: 12px;
+        color: #777;
+    }
+
+    .next-btn {
+        border: none;
+        background: #4285f4;
+        color: white;
+        padding: 10px 22px;
+        border-radius: 3px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .next-btn:hover {
+        background: #3367d6;
+    }
+
+    .next-btn:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+    }
+
+    /* 4번째 20x20 */
+    .grid-large {
+        padding: 7px;
+        display: grid;
+        grid-template-columns: repeat(20, 1fr);
+        gap: 1px;
+        background: #ddd;
+    }
+
+    .small-tile {
+        aspect-ratio: 1;
+        background: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: clamp(5px, 1.7vw, 11px);
+        cursor: pointer;
+        user-select: none;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+    }
+
+    .small-tile:hover {
+        background: #dce9ff;
+    }
+
+    /* 성공 화면 */
+    .success {
+        display: none;
+        text-align: center;
+        padding: 50px 25px;
+    }
+
+    .success-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: #34a853;
+        color: white;
+        font-size: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .success h1 {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .success p {
+        color: #777;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 35px;
+        display: none;
+    }
+
+    @media (max-width: 450px) {
+        .captcha-box {
+            width: 100%;
+        }
+
+        .tile {
+            font-size: 38px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- 홈 버튼 -->
+<a href="https://preferlab.co.kr" class="home-btn" title="홈으로">
+    🏠
+</a>
+
+
+<div class="container">
+
+    <div class="captcha-box">
+
+        <!-- ========================= -->
+        <!-- 최초 화면 -->
+        <!-- ========================= -->
+        <div id="robotCheck" class="robot-check">
+
+            <div id="checkbox"
+                 class="checkbox"
+                 onclick="startCaptcha()">
+            </div>
+
+            <div class="robot-text">
+                로봇이 절대 아닙니다
+            </div>
+
+            <div class="captcha-logo">
+                <span class="captcha-logo-icon">↻</span>
+                CAPTCHA
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- 캡차 -->
+        <!-- ========================= -->
+
+        <div id="challenge" class="challenge">
+
+            <div class="challenge-header">
+                <div class="challenge-number" id="challengeNumber">
+                    CAPTCHA 1 / 4
+                </div>
+
+                <div class="challenge-title" id="challengeTitle">
+                    자전거를 모두 누르세요
+                </div>
+
+                <div class="challenge-subtitle" id="challengeSubtitle">
+                    자전거가 포함된 모든 칸을 선택하세요.
+                </div>
+            </div>
+
+
+            <!-- 일반 3x3 -->
+            <div id="normalGrid" class="grid">
+            </div>
+
+
+            <!-- 20x20 -->
+            <div id="largeGrid" class="grid-large" style="display:none;">
+            </div>
+
+
+            <div class="challenge-footer">
+
+                <div class="status" id="status">
+                    선택된 항목: 0
+                </div>
+
+                <button
+                    class="next-btn"
+                    id="nextBtn"
+                    onclick="nextChallenge()"
+                    disabled>
+                    다음
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- 로딩 -->
+        <!-- ========================= -->
+
+        <div id="loading" class="loading">
+            확인 중...
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- 성공 -->
+        <!-- ========================= -->
+
+        <div id="success" class="success">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <h1>
+                로봇이 아님이 증명되었습니다
+            </h1>
+
+            <p>
+                모든 인증 절차가 완료되었습니다.<br>
+                당신은 인간으로 확인되었습니다.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let currentChallenge = 1;
+let selectedTiles = [];
+let movingLights = 0;
+
+
+/* =========================
+   캡차 시작
+========================= */
+
+function startCaptcha() {
+
+    const checkbox = document.getElementById("checkbox");
+
+    checkbox.classList.add("checked");
+    checkbox.innerHTML = "✓";
+
+    setTimeout(() => {
+
+        document.getElementById("robotCheck").style.display = "none";
+        document.getElementById("challenge").style.display = "block";
+
+        loadChallenge();
+
+    }, 450);
+}
+
+
+/* =========================
+   문제 불러오기
+========================= */
+
+function loadChallenge() {
+
+    selectedTiles = [];
+
+    document.getElementById("nextBtn").disabled = true;
+    document.getElementById("status").innerText = "선택된 항목: 0";
+
+    const normalGrid = document.getElementById("normalGrid");
+    const largeGrid = document.getElementById("largeGrid");
+
+    normalGrid.innerHTML = "";
+    largeGrid.innerHTML = "";
+
+    normalGrid.style.display = "grid";
+    largeGrid.style.display = "none";
+
+
+    /* ---------------------
+       1번 : 자전거
+    --------------------- */
+
+    if (currentChallenge === 1) {
+
+        setHeader(
+            "CAPTCHA 1 / 4",
+            "자전거를 모두 누르세요",
+            "자전거가 포함된 모든 칸을 선택하세요."
+        );
+
+        const items = [
+            "🌳","🚲","🌳",
+            "🚗","🏠","🚲",
+            "🌲","🚲","☁️"
+        ];
+
+        createTiles(items, "🚲");
+    }
+
+
+    /* ---------------------
+       2번 : 신호등
+    --------------------- */
+
+    else if (currentChallenge === 2) {
+
+        setHeader(
+            "CAPTCHA 2 / 4",
+            "신호등을 모두 누르세요",
+            "신호등이 포함된 모든 칸을 선택하세요."
+        );
+
+        movingLights = 0;
+
+        const items = [
+            "🚗","🚦","🌳",
+            "🏠","🚗","🌳",
+            "🚦","🌲","🚗"
+        ];
+
+        createTiles(items, "🚦");
+    }
+
+
+    /* ---------------------
+       3번 : 소화전
+    --------------------- */
+
+    else if (currentChallenge === 3) {
+
+        setHeader(
+            "CAPTCHA 3 / 4",
+            "소화전을 모두 누르세요",
+            "사진이 흐릿합니다. 자세히 살펴보세요."
+        );
+
+        const items = [
+            "🏙️","🧯","🏢",
+            "🚗","🏢","🧯",
+            "🌫️","🚗","🏢"
+        ];
+
+        createTiles(items, "🧯");
+
+    }
+
+
+    /* ---------------------
+       4번 : i 찾기
+    --------------------- */
+
+    else if (currentChallenge === 4) {
+
+        setHeader(
+            "CAPTCHA 4 / 4",
+            "알파벳 i를 찾으세요",
+            "수많은 l 사이에 숨어 있는 i를 찾아 선택하세요."
+        );
+
+        normalGrid.style.display = "none";
+        largeGrid.style.display = "grid";
+
+        createLargeGrid();
+
+    }
+
+}
+
+
+/* =========================
+   헤더 변경
+========================= */
+
+function setHeader(number, title, subtitle) {
+
+    document.getElementById("challengeNumber").innerText = number;
+    document.getElementById("challengeTitle").innerText = title;
+    document.getElementById("challengeSubtitle").innerText = subtitle;
+
+}
+
+
+/* =========================
+   3x3 생성
+========================= */
+
+function createTiles(items, correctEmoji) {
+
+    const grid = document.getElementById("normalGrid");
+
+    items.forEach((emoji, index) => {
+
+        const tile = document.createElement("div");
+
+        tile.className = "tile";
+        tile.innerText = emoji;
+
+        tile.dataset.correct =
+            emoji === correctEmoji ? "true" : "false";
+
+        tile.onclick = function() {
+
+            if (tile.classList.contains("selected")) {
+
+                tile.classList.remove("selected");
+
+                selectedTiles =
+                    selectedTiles.filter(i => i !== index);
+
+            } else {
+
+                tile.classList.add("selected");
+                selectedTiles.push(index);
+
+                /* 2번 문제 특수효과 */
+                if (currentChallenge === 2 &&
+                    emoji === "🚦") {
+
+                    moveTrafficLight(tile);
+                }
+
+            }
+
+            updateStatus();
+
+        };
+
+        grid.appendChild(tile);
+
+    });
+
+}
+
+
+/* =========================
+   2번 신호등 이동
+========================= */
+
+function moveTrafficLight(tile) {
+
+    if (movingLights >= 3) {
+        return;
+    }
+
+    movingLights++;
+
+    setTimeout(() => {
+
+        const grid = document.getElementById("normalGrid");
+
+        const tiles =
+            Array.from(grid.children);
+
+        let emptyTiles =
+            tiles.filter(t =>
+                t.innerText !== "🚦"
+            );
+
+        if (emptyTiles.length === 0)
+            return;
+
+        let target =
+            emptyTiles[
+                Math.floor(
+                    Math.random() *
+                    emptyTiles.length
+                )
+            ];
+
+        target.innerText = "🚦";
+        target.dataset.correct = "true";
+
+        tile.innerText = "🚗";
+        tile.dataset.correct = "false";
+
+        tile.classList.remove("selected");
+
+        selectedTiles =
+            selectedTiles.filter(
+                i => i !== tiles.indexOf(tile)
+            );
+
+        updateStatus();
+
+    }, 250);
+
+}
+
+
+/* =========================
+   20x20 생성
+========================= */
+
+function createLargeGrid() {
+
+    const grid =
+        document.getElementById("largeGrid");
+
+    const answerPosition =
+        Math.floor(Math.random() * 400);
+
+    for (let i = 0; i < 400; i++) {
+
+        const tile =
+            document.createElement("div");
+
+        tile.className = "small-tile";
+
+        if (i === answerPosition) {
+
+            tile.innerText = "i";
+            tile.dataset.correct = "true";
+
+        } else {
+
+            tile.innerText = "l";
+            tile.dataset.correct = "false";
+
+        }
+
+        tile.onclick = function() {
+
+            if (tile.dataset.correct === "true") {
+
+                tile.style.background =
+                    "#34a853";
+
+                tile.style.color = "white";
+
+                document.getElementById("nextBtn")
+                    .disabled = false;
+
+                document.getElementById("status")
+                    .innerText = "정답입니다!";
+
+            } else {
+
+                tile.style.background =
+                    "#ffd9d9";
+
+                setTimeout(() => {
+                    tile.style.background = "#f4f4f4";
+                }, 350);
+
+            }
+
+        };
+
+        grid.appendChild(tile);
+
+    }
+
+}
+
+
+/* =========================
+   상태 표시
+========================= */
+
+function updateStatus() {
+
+    document.getElementById("status")
+        .innerText =
+        "선택된 항목: " +
+        selectedTiles.length;
+
+    checkAnswer();
+
+}
+
+
+/* =========================
+   정답 검사
+========================= */
+
+function checkAnswer() {
+
+    if (currentChallenge === 4)
+        return;
+
+    const tiles =
+        Array.from(
+            document.querySelectorAll(
+                "#normalGrid .tile"
+            )
+        );
+
+    const correctIndexes =
+        tiles
+            .map((tile, index) =>
+                tile.dataset.correct === "true"
+                    ? index
+                    : null
+            )
+            .filter(index => index !== null);
+
+    const selectedCorrect =
+        selectedTiles.every(
+            index =>
+                correctIndexes.includes(index)
+        );
+
+    const allCorrect =
+        correctIndexes.length ===
+        selectedTiles.length &&
+        selectedCorrect;
+
+    document.getElementById("nextBtn")
+        .disabled = !allCorrect;
+
+}
+
+
+/* =========================
+   다음 문제
+========================= */
+
+function nextChallenge() {
+
+    document.getElementById("loading")
+        .style.display = "block";
+
+    document.getElementById("challenge")
+        .style.display = "none";
+
+
+    setTimeout(() => {
+
+        document.getElementById("loading")
+            .style.display = "none";
+
+        currentChallenge++;
+
+        if (currentChallenge > 4) {
+
+            document.getElementById("success")
+                .style.display = "block";
+
+        } else {
+
+            document.getElementById("challenge")
+                .style.display = "block";
+
+            loadChallenge();
+
+        }
+
+    }, 500);
+
+}
+
+</script>
+
+</body>
+</html>
+```
