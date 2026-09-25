@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -571,52 +571,7 @@ function setHeader(number, title, subtitle) {
    3x3 생성
 ========================= */
 
-function createTiles(items, correctEmoji) {
 
-    const grid = document.getElementById("normalGrid");
-
-    items.forEach((emoji, index) => {
-
-        const tile = document.createElement("div");
-
-        tile.className = "tile";
-        tile.innerText = emoji;
-
-        tile.dataset.correct =
-            emoji === correctEmoji ? "true" : "false";
-
-        tile.onclick = function() {
-
-            if (tile.classList.contains("selected")) {
-
-                tile.classList.remove("selected");
-
-                selectedTiles =
-                    selectedTiles.filter(i => i !== index);
-
-            } else {
-
-                tile.classList.add("selected");
-                selectedTiles.push(index);
-
-                /* 2번 문제 특수효과 */
-                if (currentChallenge === 2 &&
-                    emoji === "🚦") {
-
-                    moveTrafficLight(tile);
-                }
-
-            }
-
-            updateStatus();
-
-        };
-
-        grid.appendChild(tile);
-
-    });
-
-}
 
 function createTiles(items, correctEmoji) {
 
@@ -684,10 +639,15 @@ function createFlipTiles(items) {
         // 처음에는 카드 뒷면
         tile.innerText = "❓";
 
+        // ★ 정답 여부를 저장
+        tile.dataset.correct =
+            emoji === "🧯" ? "true" : "false";
+
         tile.dataset.emoji = emoji;
 
         tile.onclick = function() {
 
+            // 이미 정답으로 선택된 소화전은 다시 클릭하지 않음
             if (tile.classList.contains("selected")) {
                 return;
             }
@@ -698,19 +658,27 @@ function createFlipTiles(items) {
             // 소화전인 경우
             if (emoji === "🧯") {
 
+                // 선택 상태
                 tile.classList.add("selected");
 
+                // 정답 목록에 추가
                 selectedTiles.push(index);
 
+                // 정답 검사
                 updateStatus();
+
+                // 0.5초 후에도 선택된 카드는
+                // 소화전이 보이도록 유지
 
             } else {
 
-                // 소화전이 아닌 경우
-                // 0.5초 동안만 보여줌
+                // 오답 카드는 0.5초 후 다시 뒤집음
                 setTimeout(() => {
 
-                    tile.innerText = "❓";
+                    // 아직 선택되지 않은 카드라면 뒤집기
+                    if (!tile.classList.contains("selected")) {
+                        tile.innerText = "❓";
+                    }
 
                 }, 500);
 
@@ -950,4 +918,4 @@ function nextChallenge() {
 
 </body>
 </html>
-```
+
