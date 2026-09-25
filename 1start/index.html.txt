@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>사라진 호텔의 비밀</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+            color: #ffffff;
+
+            /* 몽글몽글한 그라데이션 배경 */
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255, 120, 190, 0.45), transparent 32%),
+                radial-gradient(circle at 85% 15%, rgba(120, 150, 255, 0.45), transparent 35%),
+                radial-gradient(circle at 75% 80%, rgba(180, 100, 255, 0.35), transparent 35%),
+                radial-gradient(circle at 20% 85%, rgba(80, 210, 220, 0.3), transparent 30%),
+                linear-gradient(135deg, #17142f, #25204a, #15172f);
+
+            background-attachment: fixed;
+        }
+
+        /* 배경에 은은한 빛 효과 */
+        body::before {
+            content: "";
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            top: -150px;
+            left: -150px;
+            background: rgba(255, 150, 220, 0.15);
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -120px;
+            background: rgba(100, 150, 255, 0.18);
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 70px 25px 60px;
+        }
+
+        .chapter {
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: #d9cfff;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 45px;
+
+            font-size: clamp(30px, 6vw, 48px);
+            font-weight: 800;
+            letter-spacing: -2px;
+
+            text-shadow:
+                0 0 10px rgba(255, 180, 240, 0.5),
+                0 0 25px rgba(150, 140, 255, 0.35);
+        }
+
+        .story {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 24px;
+
+            padding: 40px 38px;
+
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .story p {
+            margin: 0 0 25px;
+
+            font-size: 17px;
+            line-height: 2;
+            letter-spacing: -0.3px;
+
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .story p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 문제에 사용되는 핵심 글자 */
+        .keyword {
+            color: #ff8fd8;
+            font-weight: 900;
+
+            text-shadow:
+                0 0 8px rgba(255, 100, 200, 0.8),
+                0 0 18px rgba(255, 100, 200, 0.35);
+        }
+
+        /* 전단지 */
+        .flyer {
+            margin: 35px 0;
+            padding: 25px 28px;
+
+            border-radius: 18px;
+
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            text-align: center;
+
+            font-size: 18px;
+            line-height: 1.8;
+
+            color: #fff;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .quote {
+            text-align: center;
+            margin: 35px 0;
+
+            font-size: 21px !important;
+            font-weight: 600;
+
+            color: #ffffff !important;
+
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 정답 입력 영역 */
+        .answer-area {
+            margin-top: 45px;
+            padding: 30px 25px;
+
+            text-align: center;
+
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .answer-title {
+            margin-bottom: 15px;
+
+            font-size: 14px;
+            color: #d8d2ef;
+            letter-spacing: 1px;
+        }
+
+        .answer-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .answer-input {
+            width: 100%;
+            max-width: 400px;
+
+            padding: 15px 18px;
+
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+
+            outline: none;
+
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+
+            font-size: 16px;
+
+            transition: 0.2s;
+        }
+
+        .answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .answer-input:focus {
+            border-color: #ff8fd8;
+            box-shadow: 0 0 15px rgba(255, 100, 200, 0.25);
+        }
+
+        .answer-button {
+            padding: 15px 24px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: linear-gradient(135deg, #ff8fd8, #a58cff);
+            color: #ffffff;
+
+            font-size: 16px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 5px 20px rgba(190, 100, 220, 0.3);
+
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .answer-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 25px rgba(190, 100, 220, 0.45);
+        }
+
+        .error {
+            display: none;
+
+            margin-top: 15px;
+
+            color: #ff9fbd;
+            font-size: 14px;
+        }
+
+        /* 모바일 */
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 45px 16px 40px;
+            }
+
+            h1 {
+                margin-bottom: 30px;
+                letter-spacing: -1.5px;
+            }
+
+            .story {
+                padding: 28px 22px;
+                border-radius: 20px;
+            }
+
+            .story p {
+                font-size: 15.5px;
+                line-height: 1.9;
+                margin-bottom: 22px;
+            }
+
+            .flyer {
+                padding: 20px 18px;
+                font-size: 16px;
+            }
+
+            .quote {
+                font-size: 18px !important;
+            }
+
+            .answer-area {
+                padding: 25px 18px;
+            }
+
+            .answer-form {
+                flex-direction: column;
+            }
+
+            .answer-input {
+                max-width: none;
+            }
+
+            .answer-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <div class="chapter">#1</div>
+
+        <h1>사라진 호텔의 비밀</h1>
+
+        <section class="story">
+
+            <p>
+                화려한 네온사인으로 둘러싸인 번화가.
+                그 안쪽 골목길에 작은 카페를 운영하고 있는 당신은
+                매일 진상 손님을 상대하며 고된 하루를 보내고 있습니다.
+                <strong class="keyword">현</strong>재까지도 평일 주말 밤 낮 할 것 없이
+                이미 쌓일대로 쌓인 스트레스는 감당하기 힘든 지경에 이르렀습니다.
+            </p>
+
+            <p>
+                오늘도 지친 몸을 이끌고 퇴근한 당신은,
+                '오늘도 회식이야'라며 카톡을 남긴 채 연락이 끊긴 남편을 뒤로 하고,
+                적막한 집에 도착합니다.
+            </p>
+
+            <p>
+                문 손잡이를 돌리려던 찰나,
+                현관에 누가 전단지를 붙여놓고 갔군요.
+            </p>
+
+            <div class="flyer">
+                "현<strong class="keyword">실</strong>의 스트레스를 없애드립니다!<br>
+                마법의 힘을 가진 '더 베스트 호텔'을 찾아주세요!<br>
+                행복만 가득한 곳으로..."
+            </div>
+
+            <p>
+                마침 결혼기념일 5주년을 앞두고 특별한 여행지를 기획하고 있는 당신은,
+                남편과 함께 특이한 홍보물을 보고 더 베스트 호텔을 방문하려 합니다.
+            </p>
+
+            <p>
+                회식까지 마친 후 집에 돌아온 직장인 남편에게<strong class="keyword">도</strong>
+                무심한듯 전단지를 내보인 당신.
+                다 좋아 알아서 해~ 라며 무책임하게 전단지를 다시 넘겨주는 남편을 보니
+                조금은 화가 났지만, 스트레스를 없애준다는 말에 묘한 긴장감과 기대가 듭니다.
+            </p>
+
+            <p class="quote">
+                "현실의 스트레스를.. 없애준다고..?"
+            </p>
+
+            <p>
+                더 이상 <strong class="keyword">피</strong>하기 싫었던 당신은
+                멋쩍은 듯 미소를 지어보입니다.
+            </p>
+
+        </section>
+
+
+        <!-- 정답 입력 -->
+        <section class="answer-area">
+
+            <div class="answer-title">
+                숨겨진 단어를 찾아 입력하세요.
+            </div>
+
+            <div class="answer-form">
+
+                <input
+                    type="text"
+                    id="answer"
+                    class="answer-input"
+                    placeholder="정답을 입력하세요"
+                    autocomplete="off"
+                >
+
+                <button
+                    class="answer-button"
+                    onclick="checkAnswer()">
+                    입력
+                </button>
+
+            </div>
+
+            <div id="error" class="error">
+                정답이 아닙니다.
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        function checkAnswer() {
+
+            const input = document
+                .getElementById("answer")
+                .value
+                .trim();
+
+            if (input === "현실도피") {
+
+                window.location.href =
+                    "https://preferlab.co.kr/thebesthotel";
+
+            } else {
+
+                document.getElementById("error").style.display = "block";
+
+            }
+        }
+
+
+        // 엔터키로도 정답 제출 가능
+        document.getElementById("answer").addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
+```
